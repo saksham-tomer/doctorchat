@@ -4,7 +4,7 @@ import { VideoPlayer } from "../../components/VideoPlayer";
 import { RoomContext } from "../../lib/RoomContext";
 import { useParams } from "next/navigation";
 
-export default function Page({id}){
+export default function Page(){
     const {id} = useParams()
     const { ws, me, peers, stream } = useContext(RoomContext);
 

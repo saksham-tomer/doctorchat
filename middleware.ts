@@ -31,4 +31,4 @@ export default withAuth(function middleware(req){
     }
 })
 
-export const config = {matcher: ["/admin","/doctor:path*","/patients:path*",]}
+export const config = {matcher: ["/admin","/doctor:path*","/patients:path*,/feedback,/test",]}
