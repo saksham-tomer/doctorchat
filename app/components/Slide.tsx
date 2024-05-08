@@ -30,7 +30,9 @@ function Slide({ props }) {
       },[props.image])
   const router = useRouter();
   const bookAppointment = () => {
-    router.push("/patients/Booking");
+    const id = props.did
+    router.push(`/patients/Booking/${id}`);
+
   };
   const { toggleSlider, sliderVisible } = useSlider();
   return (

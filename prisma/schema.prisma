@@ -84,7 +84,7 @@ model Doctor {
   phone          BigInt?       
   address        String?
   about          String?
-  patient_id     BigInt?
+  patient_id     String?
   specialization String?
   image          String?
   dob            DateTime?

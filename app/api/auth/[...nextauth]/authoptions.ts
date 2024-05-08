@@ -51,17 +51,34 @@ export const authOptions: AuthOptions={
             },
             async authorize(credentials,req){
                 console.log(credentials);
+
                 //handling the login and matching the crediential if exist in db
                 try {
+                //  const doctor = await prisma.doctor.findUnique({
+                //     where:{
+                //         name: credentials.username,
+                //         doctorid: credentials.password,
+                //     }
+                //  })
                  const user = await prisma.patient.findUnique({
                     where: {
                         username: credentials.username,
                         password: credentials.password,
                     }
                 })
-                if( user) {
+                if( user /* || doctor*/) {
                     return user 
-                }
+
+                }/* else if(doctor) 
+                   {
+                    return ({
+                        role: 'doctor',
+                        name: doctor.name,
+                        image: doctor.image,
+                        id: doctor.doctorid,
+                    })
+                   } 
+                    */
                 } catch (error) {
                     console.log(error);    
                 }

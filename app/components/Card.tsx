@@ -38,7 +38,8 @@ export default function Card({ props }) {
   }
 
    const bookAppointment = () => {
-    router.push("/patients/Booking");
+    const id = props.did
+    router.push(`/patients/Booking/${id}`);
   };
 
   return (

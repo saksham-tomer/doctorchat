@@ -1,21 +1,32 @@
 "use client";
 
-import React, { useState } from "react";
+import { RoomContext } from "../../../lib/RoomContext";
+import React, { useContext,useEffect, useState } from "react";
 import Image from "next/image";
 import { Calendar } from "@/components/ui/calendar";
 //import { ToastAction } from "@/components/ui/toast";
 //import { useToast } from "@/components/ui/use-toast";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { useRouter } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
+import SendDoc from "../sendDoc";
 
 function Page() {
   const [date, setDate] = useState();
  // const { toast } = useToast();
-  const router = useRouter()
-  const handleBooking = () =>  {
-    toast("Appointment Booked!!")
 
+ const {me} = useContext(RoomContext)
+ const {id} = useParams()
+
+  const router = useRouter()
+  const handleBooking = async() =>  {
+    toast("Appointment Booked!!")
+    //const Id = JSON.stringify(id)
+    const Id = JSON.parse(id)
+    const Me = me._id
+    const MMe = JSON.stringify(Me)
+    const resp = await SendDoc({id,MMe})      
+    //console.log(id,Id);
     setTimeout(()=>{
       router.push('/patients/appointmentDetails')
     },800)

@@ -77,7 +77,7 @@ CREATE TABLE "Doctor" (
     "phone" BIGINT,
     "address" TEXT,
     "about" TEXT,
-    "patient_id" BIGINT,
+    "patient_id" TEXT,
     "specialization" TEXT,
     "image" TEXT,
     "dob" TIMESTAMP(3),

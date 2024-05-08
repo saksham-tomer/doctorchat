@@ -12,7 +12,7 @@ export const VideoPlayer: React.FC<{
     }, [stream]);
     return (
         <div className={className}>
-            <video playsInline ref={videoRef} autoPlay muted={true} />
+            <video playsInline ref={videoRef} autoPlay muted={false} />
         </div>
     );
 };

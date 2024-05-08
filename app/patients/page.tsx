@@ -161,6 +161,7 @@ function Page() {
                 <div key={id}>
                   <Slide props={{
                      lastname:doctors[doc].lastname,
+                     did:doctors[doc].doctorid,
                      specializaion:doctors[doc].specialization,
                      image:doctors[doc].image,
                      hospital: 'srms',
@@ -181,6 +182,7 @@ function Page() {
                 <div key={id}>
                   <Card props={{
                      name:doctors[doc].lastname,
+                     did:doctors[doc].doctorid,
                      speciality:doctors[doc].specialization,
                      image:doctors[doc].image,
                      hospital: 'srms',
