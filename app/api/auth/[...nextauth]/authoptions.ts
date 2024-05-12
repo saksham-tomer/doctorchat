@@ -3,6 +3,7 @@ import GoogleProvider from 'next-auth/providers/google'
 import {PrismaAdapter} from '@auth/prisma-adapter'
 import prisma from '@/app/lib/prisma'
 import  CredentialsProvider  from 'next-auth/providers/credentials'
+import { AuthOptions } from 'next-auth'
 
 
 
@@ -54,31 +55,31 @@ export const authOptions: AuthOptions={
 
                 //handling the login and matching the crediential if exist in db
                 try {
-                //  const doctor = await prisma.doctor.findUnique({
-                //     where:{
-                //         name: credentials.username,
-                //         doctorid: credentials.password,
-                //     }
-                //  })
+                 const doctor = await prisma.doctor.findUnique({
+                    where:{
+                        name: credentials.lastname,
+                        doctorid: parseInt(credentials.password),
+                    }
+                 })
                  const user = await prisma.patient.findUnique({
                     where: {
                         username: credentials.username,
                         password: credentials.password,
                     }
                 })
-                if( user /* || doctor*/) {
+                if( user ) {
                     return user 
 
-                }/* else if(doctor) 
+                } else if(doctor) 
                    {
                     return ({
                         role: 'doctor',
-                        name: doctor.name,
-                        image: doctor.image,
+                        name: doctor.lastname,
+                       // image: doctor.image,
                         id: doctor.doctorid,
                     })
                    } 
-                    */
+                    
                 } catch (error) {
                     console.log(error);    
                 }

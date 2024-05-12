@@ -5,9 +5,9 @@ export default withAuth(function middleware(req){
             if(req.nextUrl.pathname.startsWith('/patients')&& req.nextauth.token?.role != "patient"){
                 return NextResponse.rewrite(new URL('/doctor',req.url))
             }
-            if(req.nextUrl.pathname.startsWith('/doctor')&& req.nextauth.token?.role != "doctor"){
-                return NextResponse.redirect('http://localhost:3000/patients')
-            }
+            // if(req.nextUrl.pathname.startsWith('/doctor')&& (req.nextauth.token?.role != "doctor" || req.nextauth.token?.role != "admin")){
+            //     return NextResponse.redirect('http://localhost:3000/')
+            // }
             if(req.nextUrl.pathname.startsWith('/admin')&& req.nextauth.token?.role != "admin"){
                 return NextResponse.redirect('http://localhost:3000/')
             }
