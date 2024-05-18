@@ -55,6 +55,7 @@ useEffect(()=>{
             height={350}
             width={350}
           />
+          <Join />
           <div className=" flex flex-row  items-center justify-between mt-12">
             <div className="flex flex-col  items-center min-w-full">
               <div className="text-5xl font-bold min-h-full text-left pb-4">
