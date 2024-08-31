@@ -81,7 +81,7 @@ model Doctor {
   email          String?
   lastname       String?
   sex            Sex       @default(Male)
-  phone          BigInt?       
+  phone          BigInt?
   address        String?
   about          String?
   patient_id     String?
@@ -89,7 +89,6 @@ model Doctor {
   image          String?
   dob            DateTime?
   patients       Patient[]
-
 }
 
 enum Role {
