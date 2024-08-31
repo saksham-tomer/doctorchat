@@ -19,8 +19,9 @@ import Confetti from "react-confetti";
 import useDeviceDetection from "@/utils/hooks/useDeviceDetect";
 import Image from "next/image";
 import { GetTime } from "@/app/lib/getTime";
+import { Lock } from "lucide-react";
 
-export default function Page({ searchParams }) {
+export default function Page({ searchParams }: { searchParams: any }) {
   const { ws, me, peers, stream, sendChat, receivedMessage, incomingChat } =
     useContext(RoomContext);
   const router = useRouter();
@@ -34,35 +35,15 @@ export default function Page({ searchParams }) {
 
   const timeNow = GetTime.getTime();
 
-  // const chats = [
-  //   {
-  //     message: "hello from client",
-  //     sender: "client",
-  //     time: timeNow,
-  //   },
-  //   {
-  //     message: " hello from server",
-  //     sender: "server",
-  //     time: timeNow,
-  //   },
-  //   {
-  //     message: "hello from client",
-  //     sender: "client",
-  //     time: timeNow,
-  //   },
-  // ];
-  const [receivedChatState, setReceivedChatState] = useState<
-    inputParams[] | null | any
-  >([]);
   const [sendChatState, setSendChatState] = useState<inputParams[]>([]);
 
   useEffect(() => {
+
+    //dont add setReceivedMessage in the deps array as it will create hydration error due to infinite loop
+
     console.log(receivedMessage, "rec");
-    if (receivedMessage.length !== prevReceivedMessageRef.current.length) {
-      setReceivedChatState([...receivedChatState, ...receivedMessage]);
-      prevReceivedMessageRef.current = receivedMessage;
-    }
-  }, [receivedMessage, receivedChatState]);
+      setSendChatState([...sendChatState, ...receivedMessage]);
+  }, [receivedMessage]);
 
   type inputParams = {
     message: string;
@@ -88,8 +69,6 @@ export default function Page({ searchParams }) {
 
       //sendChat(newInput, roomId);
       incomingChat(newInput, roomId);
-      // ws.emit("sendChat", { newInput, roomId });
-
       inputRef.current?.focus();
     }
   };
@@ -99,10 +78,10 @@ export default function Page({ searchParams }) {
 
   return (
     <div className="flex relative flex-col items-center justify-center text-4xl text-red-400 bg-gradient-to-bl from-pink-100 via-purple-300 to-cyan-300 min-h-screen">
-      <div className="flex shadow-xl shadow-teal-500 flex-col relative gap-8 items-center justify-center">
-        <video
+      <div className="grid grid-cols-4 gap-4">
+        {/* <video
           className="rounded-xl ring-2 ring-blue-300"
-          src="https://media.istockphoto.com/id/1274771319/video/fit-woman-athlete-maintaining-a-healthy-lifestyle-hiking-in-mountains-over-rocky-trails-and.mp4?b=1&s=mp4-640x640-is&k=20&c=22lXBSwH14mGqyrFGbZRVufbwYs0DSOPeCCLq3v3h7Y="
+          src={stream}
           autoPlay
           loop
           width={380}
@@ -110,12 +89,17 @@ export default function Page({ searchParams }) {
         />
         <video
           className="rounded-full transform translate-x-28 ring-1 ring-gray-600 shadow-md shadow-purple-700 translate-y-14 absolute"
-          src="https://media.istockphoto.com/id/1278197574/video/family-canoeing-on-a-stunning-mountain-lake.mp4?b=1&s=mp4-640x640-is&k=20&c=Ci42KFy6YA6VOGkaQRzTuji9iBk0G34sECU9-8dkcgA="
+          src={me}
           autoPlay
           loop
           width={150}
           height={150}
-        />
+        /> */}
+        <VideoPlayer key={"me"} stream={stream} />
+
+        {Object.values(peers).map((peer: any) => (
+          <VideoPlayer key={peer.id} stream={peer.stream} />
+        ))}
       </div>
       <button
         onClick={leave}
@@ -130,7 +114,7 @@ export default function Page({ searchParams }) {
               {toggle && (
                 <button
                   onClick={() => setToggle((prev) => !prev)}
-                  className="shadow-xl bg-gray-300 p-1 rounded-full inset-1 inset ring-1 ring-gray-400"
+                  className="shadow-xl bg-gray-300 p-1 rounded-full inset-1 inset ring-1 ring-gray-400 mr-2"
                 >
                   <Image
                     onClick={() => sendChat(roomId)}
@@ -143,19 +127,12 @@ export default function Page({ searchParams }) {
               )}
             </DrawerTrigger>
             <DrawerContent>
-              <div className="flex flex-col relative">
-                <div className="mx-auto min-h-72 max-h-72 w-full max-w-sm">
-                  <DrawerHeader>
-                    <DrawerTitle>Chat</DrawerTitle>
-                    <DrawerDescription>
-                      Ask your queries and prescriptions here
-                    </DrawerDescription>
-                  </DrawerHeader>
-                  <DrawerFooter>
+              <div className="flex flex-col">
+               <DrawerFooter>
                     <DrawerClose asChild>
                       <button
-                        className="absolute transform -translate-y-24 -translate-x-2 shadow-lg shadow-indigo-300 p-2 rounded-full bg-gray-300"
-                        onClick={() => setToggle((prev) => !prev)}
+                        className="absolute shadow-lg shadow-indigo-300 p-2 rounded-full bg-gray-300"
+                        onClick={() => setToggle((prev) => prev = true)}
                       >
                         <Image
                           src={"/close.png"}
@@ -166,26 +143,29 @@ export default function Page({ searchParams }) {
                       </button>
                     </DrawerClose>
                   </DrawerFooter>
-                  <div className="flex flex-col items-center relative">
-                    {sendChatState.map((message, index) => (
-                      <div key={index} className="ml-auto mr-2 flex flex-col">
+                <div className="mx-auto min-h-72 w-full flex flex-col relative max-h-[calc(100vh-100px)] overflow-y-auto">
+                  <DrawerHeader>
+                    <DrawerTitle>Chat</DrawerTitle>
+                    <DrawerDescription className="flex flex-row gap-2 justify-center items-center"><Lock width={12} />Chat is secured with encryption</DrawerDescription>
+                  </DrawerHeader>
+               
+                  <div className="flex flex-col items-center justify-center">
+                    {sendChatState.map((message, index) => {
+                     return message.sender === "client" ?
+                      <div key={index} className=" flex flex-col ml-auto mr-2">
                         <div
                           key={index}
-                          className="bg-indigo-200 rounded-lg px-2 py-1"
+                          className="bg-indigo-400 rounded-xl px-2 py-1"
                         >
                           {message.message}
                         </div>
                         <div className="mr-2 text-gray-500 font-medium text-xs ">
                           {message.time}
                         </div>
-                      </div>
-                    ))}
-                    {receivedChatState.map(
-                      (message: inputParams, index: any) => (
-                        <div key={index} className="mr-auto ml-2 flex flex-col">
+                      </div> :  <div key={index} className="flex flex-col mr-auto ml-2">
                           <div
                             key={index}
-                            className=" bg-indigo-200 rounded-lg px-2 py-1"
+                            className=" bg-slate-300 rounded-xl px-2 py-1"
                           >
                             {message.message}
                           </div>
@@ -193,10 +173,10 @@ export default function Page({ searchParams }) {
                             {message.time}
                           </div>
                         </div>
-                      )
-                    )}
+                        })}
+                      </div>
                     <form
-                      className="flex items-center justify-center pt-2 absolute transform translate-y-32"
+                      className="flex items-center mt-auto mb-2 left-auto right-auto justify-center pt-2"
                       onSubmit={handleSubmit}
                     >
                       <input
@@ -224,7 +204,6 @@ export default function Page({ searchParams }) {
                         />
                       </button>
                     </form>
-                  </div>
                 </div>
               </div>
             </DrawerContent>
