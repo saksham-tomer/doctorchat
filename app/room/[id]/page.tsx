@@ -20,7 +20,7 @@ import useDeviceDetection from "@/utils/hooks/useDeviceDetect";
 import Image from "next/image";
 import { GetTime } from "@/app/lib/getTime";
 
-export default function Page({ searchParams }) {
+export default function Page({ searchParams }: { searchParams: any }) {
   const { ws, me, peers, stream, sendChat, receivedMessage, incomingChat } =
     useContext(RoomContext);
   const router = useRouter();
@@ -99,10 +99,10 @@ export default function Page({ searchParams }) {
 
   return (
     <div className="flex relative flex-col items-center justify-center text-4xl text-red-400 bg-gradient-to-bl from-pink-100 via-purple-300 to-cyan-300 min-h-screen">
-      <div className="flex shadow-xl shadow-teal-500 flex-col relative gap-8 items-center justify-center">
-        <video
+      <div className="grid grid-cols-4 gap-4">
+        {/* <video
           className="rounded-xl ring-2 ring-blue-300"
-          src="https://media.istockphoto.com/id/1274771319/video/fit-woman-athlete-maintaining-a-healthy-lifestyle-hiking-in-mountains-over-rocky-trails-and.mp4?b=1&s=mp4-640x640-is&k=20&c=22lXBSwH14mGqyrFGbZRVufbwYs0DSOPeCCLq3v3h7Y="
+          src={stream}
           autoPlay
           loop
           width={380}
@@ -110,12 +110,17 @@ export default function Page({ searchParams }) {
         />
         <video
           className="rounded-full transform translate-x-28 ring-1 ring-gray-600 shadow-md shadow-purple-700 translate-y-14 absolute"
-          src="https://media.istockphoto.com/id/1278197574/video/family-canoeing-on-a-stunning-mountain-lake.mp4?b=1&s=mp4-640x640-is&k=20&c=Ci42KFy6YA6VOGkaQRzTuji9iBk0G34sECU9-8dkcgA="
+          src={me}
           autoPlay
           loop
           width={150}
           height={150}
-        />
+        /> */}
+        <VideoPlayer key={"me"} stream={stream} />
+
+        {Object.values(peers).map((peer: any) => (
+          <VideoPlayer key={peer.id} stream={peer.stream} />
+        ))}
       </div>
       <button
         onClick={leave}
@@ -144,12 +149,10 @@ export default function Page({ searchParams }) {
             </DrawerTrigger>
             <DrawerContent>
               <div className="flex flex-col relative">
-                <div className="mx-auto min-h-72 max-h-72 w-full max-w-sm">
+                <div className="mx-auto min-h-72 w-full max-w-sm max-h-[calc(100vh-100px)] overflow-y-auto">
                   <DrawerHeader>
                     <DrawerTitle>Chat</DrawerTitle>
-                    <DrawerDescription>
-                      Ask your queries and prescriptions here
-                    </DrawerDescription>
+                    <DrawerDescription></DrawerDescription>
                   </DrawerHeader>
                   <DrawerFooter>
                     <DrawerClose asChild>

@@ -21,7 +21,9 @@ interface ChatData {
   time: string;
 }
 
-export const RoomProvider: React.FunctionComponent = ({ children }) => {
+export const RoomProvider: React.FunctionComponent<{
+  children: React.ReactNode;
+}> = ({ children }) => {
   const [receivedMessage, setReceivedMessage] = useState<ChatData[]>([]);
   const [me, setMe] = useState<Peer>();
   const [peers, dispatch] = useReducer(peersReducer, {});
