@@ -60,7 +60,7 @@ export const RoomProvider: React.FunctionComponent<{
   };
 
   const incomingChat = (newInput: string, roomId: string) => {
-    const fullMessage = { message: newInput, sender: "client", time: timeNow };
+    const fullMessage = { message: newInput, sender: "server", time: timeNow };
     ws.emit("incoming-chat", fullMessage, roomId);
   };
 
