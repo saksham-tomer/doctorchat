@@ -65,18 +65,19 @@ model VerificationToken {
 }
 
 model Patient {
-  name           String?
   username       String?  @unique
   password       String?  @unique
-  age            String?
-  sex            String?  
-  about          String?
-  email          String  @unique
-  illness        String[]
   doctorassigned Int?
-  patientid      BigInt? @unique
-  role           Role?   @default(patient)
-  doctor         Doctor? @relation(fields: [doctorassigned], references: [doctorid])
+  image          String?
+  patientid      BigInt?  @unique
+  role           Role?    @default(patient)
+  about          String?
+  age            String?
+  sex            String?
+  email          String   @unique
+  illness        String[]
+  name           String?
+  doctor         Doctor?  @relation(fields: [doctorassigned], references: [doctorid])
 }
 
 model Doctor {

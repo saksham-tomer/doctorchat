@@ -40,6 +40,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { redirect, useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { createPatientProfile } from "@/app/lib/handlePatientProfile";
+import getPatientPicture from "@/app/lib/patientPictureHelper";
 
 type Props = {
   props: React.ReactNode;
@@ -54,15 +55,44 @@ const Page = (props: Props) => {
   const [buttonState, setButtonState] = useState(false);
   const [tags, setTags] = useState<string[] | never>([]);
 
+  const [showPassword, setShowPassword] = useState<boolean>(false);
+  const [hide, setHide] = useState<string | never>("password");
+
+  const togglePassowrd = () => {
+    setShowPassword((prev) => !prev);
+    if (showPassword == false) {
+      setHide((prev) => (prev = "password"));
+    } else {
+      setHide((prev) => (prev = "text"));
+    }
+  };
+
   const handleFileUpload = (file: any) => {
     setButtonState((prev) => (prev = true));
     setPatientPicture(file);
   };
 
-  const handleInput = (e: React.FormEvent) => {
+  const uploadImage = async () => {
+    const email = session?.user.email;
+    const res = await fetch("http://localhost:3000/api/uploadPatientPicture", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        PatientImage: "true",
+      },
+      body: JSON.stringify({ picture: patientPicture, email: email }),
+    });
+    if (res) {
+      console.log("success image uploaded successfully");
+    } else {
+      console.error("Error uploading patient image");
+    }
+  };
+
+  const handleInput = (e: React.KeyboardEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData(e.target as HTMLFormElement);
-    const email = session?.user.email ?? "";
+    const email: string | undefined = session?.user.email;
     createPatientProfile(formData, email, tags);
     // handle form input logic here
   };
@@ -70,7 +100,30 @@ const Page = (props: Props) => {
   const router = useRouter();
 
   useEffect(() => {
-    setPatientPicture((prev) => (prev = session?.user.image));
+    getPatientPicture(session?.user.email);
+    getPatientPicture(session?.user.email)
+      .then((image) => setPatientPicture(image))
+      .catch((error) => console.error("Error getting patient picture:", error));
+    // async () => {
+    //   let success = await fetch("http://localhost:3000/api/getPatientInfo", {
+    //     method: "GET",
+    //     headers: {
+    //       "Content-Type": "application/json",
+    //     },
+    //   });
+    //   if (success) {
+    //     console.log("look here bitches", success);
+    //     if (success.ok) {
+    //       const { image } = await success.json();
+    //       console.log("user image ===>", image);
+    //       setPatientPicture((prev) => (prev = image));
+    //     } else {
+    //       console.error("Image not found failed");
+    //     }
+    //   } else console.error("No image found");
+    // };
+    //setPatientPicture((prev) => (prev = session?.user.image));
+    console.log("setPatientPicture", patientPicture);
   }, [session?.user.image]);
 
   titleCallback("Create Profile");
@@ -116,6 +169,7 @@ const Page = (props: Props) => {
                 </div>
                 <DialogFooter>
                   <Button
+                    onClick={uploadImage}
                     type="submit"
                     className={buttonState ? "bg-green-400" : ""}
                   >
@@ -153,21 +207,40 @@ const Page = (props: Props) => {
           </div>
           <Separator className="bg-slate-300" />
           <div className="flex flex-col md:min-w-full justify-center mt-4">
-            <div className="md:flex md:p-2  md:justify-center items-center lg:p-3">
-              <div className="flex flex-col md:w-1/2 mr-auto ml-2 sm:mb-2">
-                <h3 className="text-sm font-bold md:text-xl lg:text-2xl xl:text-3xl">
-                  Public Profile
-                </h3>
-                <p className="text-xs font-semibold md:text-sm text-slate-400 lg:text-sm">
-                  This will be displayed on your profile
+            <div className="md:flex md:p-2 md:flex-col items-center lg:p-3">
+              <div className="flex flex-row md:justify-items-end w-full">
+                <div className="flex flex-col md:w-full mr-auto ml-2 sm:mb-2">
+                  <h3 className="text-sm font-bold md:text-xl lg:text-2xl xl:text-3xl">
+                    Public Profile
+                  </h3>
+                  <p className="text-xs font-semibold md:text-sm text-slate-400 lg:text-sm">
+                    This will be displayed on your profile
+                  </p>
+                </div>
+                <p className="p-2 md:w-full border-dashed mr-2 items-center justify-center  border-green-600 bg-green-400 ml-auto text-white hidden md:flex md:mb-4 border-2 rounded-xl md:ml-auto">
+                  Previous Changes Will be Overridden
                 </p>
               </div>
+
               <Input
+                onKeyDown={(e) => e.key === "Enter" && e.preventDefault()}
                 name="name"
                 id="name"
-                className="ml-2 mt-2 md:ml-0 w-1/2 md:flex md:flex-grow md:mr-2"
+                className="ml-2 mt-2  md:ml-auto w-1/2 md:flex md:flex-grow md:mr-2"
                 placeholder="Patient Name"
               />
+              <p className="text-xs md:ml-auto ml-2 md:mr-2 mt-4 font-semibold text-slate-400">
+                Change your password
+              </p>
+              <Input
+                onKeyDown={(e) => e.key === "Enter" && e.preventDefault()}
+                name="password"
+                type={hide}
+                id="password"
+                className="ml-2 mt-2 md:ml-auto w-1/2 md:flex md:flex-grow md:mr-2"
+                placeholder="Enter your password"
+              />
+              <button onClick={togglePassowrd}></button>
             </div>
 
             <Separator className="mt-3 bg-slate-300" />
@@ -191,9 +264,9 @@ const Page = (props: Props) => {
                   <SelectContent>
                     <SelectGroup>
                       <SelectLabel>Sex</SelectLabel>
-                      <SelectItem value="apple">Male</SelectItem>
-                      <SelectItem value="banana">Female</SelectItem>
-                      <SelectItem value="pineapple">Transgender</SelectItem>
+                      <SelectItem value="Male">Male</SelectItem>
+                      <SelectItem value="Female">Female</SelectItem>
+                      <SelectItem value="Transgender">Transgender</SelectItem>
                     </SelectGroup>
                   </SelectContent>
                 </Select>
@@ -228,16 +301,17 @@ const Page = (props: Props) => {
                   })}
                 </div>
                 <Input
-                  name="illenss"
+                  name="illness"
                   id="illness"
                   onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
                     if (e.key === "Enter") {
+                      e.preventDefault();
                       setTags([...tags, e.currentTarget.value]);
                       e.currentTarget.value = "";
                     }
                   }}
                   placeholder="Type of illness"
-                  className="md:ml-0 w-1/2 md:flex md:flex-grow md:mr-2"
+                  className="md:ml-0 w-1/2 md:flex mt-1 md:flex-grow md:mr-2"
                 />
               </div>
               <div className="flex flex-col pr-6 mt-4 md:min-w-full md:mr-4">
