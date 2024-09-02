@@ -1,11 +1,9 @@
-
 "use client";
 
 import Image from "next/image";
 import React, { useRef, useState } from "react";
 
-const FileUpload = ({onFileUpload}) => {
-
+const FileUpload = ({ onFileUpload }) => {
   const [dragging, setDragging] = useState(false);
   const [file, setFile] = useState("");
   const inref = useRef(null);
@@ -47,14 +45,14 @@ To set the dropped image inside an <img> tag on the drop event, you can use the 
     reader.onload = () => {
       setFile((prev) => (prev = reader.result));
 
-      onFileUpload(reader.result)
+      onFileUpload(reader.result);
     };
   };
 
   return (
     <div
       onClick={() => inref.current.click()}
-      className={`p-6 border-dashed relative border-2 shadow-xl border-gray-400 rounded-full ${
+      className={`p-1 border-dashed max-h-36 max-w-36 min-h-36 min-w-36 flex items-center justify-center relative border-2 shadow-xl border-gray-400 rounded-full ${
         dragging ? "bg-gray-300 text-gray-500" : "bg-white"
       } hover:bg-gray-50`}
       onDrop={handleDrop}
@@ -62,10 +60,10 @@ To set the dropped image inside an <img> tag on the drop event, you can use the 
       onDragEnter={handleDragEnter}
       onDragLeave={handleDragLeave}
     >
-      <div className="flex  bg-transparent backdrop-blur-md flex-col items-center justify-center space-y-2">
+      <div className="flex rounded-full  bg-transparent backdrop-blur-md object-cover items-center justify-center">
         {file ? (
           <Image
-            className="rounded-full w-full"
+            className="rounded-full min-w-32 min-h-32 max-w-32 max-h-32 object-cover"
             src={file}
             alt="file"
             height={55}

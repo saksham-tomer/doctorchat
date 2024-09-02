@@ -65,10 +65,14 @@ model VerificationToken {
 }
 
 model Patient {
-  firstname      String?
-  lastname       String?
-  username       String  @unique
-  password       String  @unique
+  name           String?
+  username       String?  @unique
+  password       String?  @unique
+  age            String?
+  sex            String?  
+  about          String?
+  email          String  @unique
+  illness        String[]
   doctorassigned Int?
   patientid      BigInt? @unique
   role           Role?   @default(patient)

@@ -14,6 +14,12 @@ WORKDIR /usr/src/app
 COPY package.json package-lock.json ./
 
 # Install production dependencies
+
+RUN npm install
+
+# Generate Tailwind CSS
+#RUN npm run build:css
+
 RUN npm ci --omit=dev
 
 # Copy the rest of the application code
@@ -23,6 +29,9 @@ COPY . .
 
 # Make the start script executable
 RUN npx prisma generate
+
+# Prune dev dependencies
+RUN npm prune --production
 
 RUN chmod +x ./start.sh
 
