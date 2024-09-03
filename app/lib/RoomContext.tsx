@@ -8,7 +8,7 @@ import socketIOClient from "socket.io-client";
 import { peersReducer } from "./peersReducer";
 import { addPeerAction, removePeerAction } from "./peersActions";
 import { useRouter } from "next/navigation";
-import { SessionProvider } from "next-auth/react";
+import { SessionProvider, useSession } from "next-auth/react";
 import { GetTime } from "./getTime";
 const WS = "http://localhost:8080";
 
@@ -129,7 +129,15 @@ export const RoomProvider: React.FunctionComponent<{
 
   return (
     <RoomContext.Provider
-      value={{ ws, me, peers, stream, sendChat, receivedMessage, incomingChat }}
+      value={{
+        ws,
+        me,
+        peers,
+        stream,
+        sendChat,
+        receivedMessage,
+        incomingChat,
+      }}
     >
       <SessionProvider>{children}</SessionProvider>
     </RoomContext.Provider>

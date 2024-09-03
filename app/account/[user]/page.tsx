@@ -5,7 +5,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { ChevronRight } from "lucide-react";
 import { useSession } from "next-auth/react";
 import Image from "next/image";
-import { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { TitleContext } from "./layout";
 import { useRouter } from "next/navigation";
 
@@ -22,8 +22,12 @@ export default function Page() {
   let { titleCallback } = useContext(TitleContext);
   const { data: session } = useSession();
   const [isLoading, setIsLoading] = useState<Boolean>(true);
-  const [patientState, setPatientState] = useState<PatientData | null>(null);
+  const [patientState, setPatientState] = useState<
+    PatientData | null | React.ReactNode
+  >(null);
   const [displayState, setDispalyState] = useState<Boolean>(false);
+  const [displayBadge, setDisplayBadge] = useState<boolean>(false);
+  const { isOnline } = useContext(TitleContext);
 
   titleCallback("Patient Profile");
 
@@ -36,20 +40,26 @@ export default function Page() {
   };
 
   useEffect(() => {
+    isOnline && setDisplayBadge(true);
+    console.log("badge state", isOnline);
     // Define the async function inside useEffect and call it
     const fetchPatientData = async () => {
       try {
-        const response = await fetch("/api/getPatientInfo", {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(session?.user.email),
-        });
+        const response = await fetch(
+          "http://localhost:3000/api/getPatientByEmail",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ email: session?.user.email }),
+          }
+        );
         if (response.status === 500) {
           setDispalyState(true);
         }
         const patientData: PatientData = await response.json();
+        console.log(patientData);
         setPatientState(patientData);
         setIsLoading(false);
       } catch (error: any) {
@@ -77,7 +87,7 @@ export default function Page() {
             >
               <Image
                 className="rounded-full"
-                src={session?.user.image}
+                src={patientState ? patientState?.image : session?.user.image}
                 alt="user image"
                 width={120}
                 height={120}
@@ -92,10 +102,10 @@ export default function Page() {
         )}
         <div className="flex flex-col items-center mt-1">
           <p className="text-sm font-semibold text-slate-600">
-            {session?.user.name}
+            {patientState ? patientState?.name : session?.user?.name}
           </p>
           <p className="text-xs font-medium text-slate-400">
-            {session?.user.email}
+            {patientState ? patientState?.email : session?.user?.email}
           </p>
         </div>
       </div>
@@ -109,6 +119,7 @@ export default function Page() {
           </button>
         </div>
       )}
+      {displayBadge && <div>badge live</div>}
     </div>
   );
 }

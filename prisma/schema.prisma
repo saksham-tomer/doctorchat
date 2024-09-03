@@ -65,23 +65,27 @@ model VerificationToken {
 }
 
 model Patient {
-  username       String?  @unique
-  password       String?  @unique
-  doctorassigned Int?
-  image          String?
-  patientid      BigInt?  @unique
-  role           Role?    @default(patient)
-  about          String?
-  age            String?
-  sex            String?
-  email          String   @unique
-  illness        String[]
-  name           String?
-  doctor         Doctor?  @relation(fields: [doctorassigned], references: [doctorid])
+  id              Int      @id @default(autoincrement())
+  username        String?  @unique
+  password        String?  @unique
+  doctorassigned  Int?
+  patientverified Boolean? @default(false)
+  image           String?
+  patientid       BigInt?  @unique
+  role            Role?    @default(patient)
+  about           String?
+  age             String?
+  sex             String?
+  email           String   @unique
+  illness         String[]
+  name            String?
+  doctor          Doctor?  @relation(fields: [doctorassigned], references: [doctorid])
 }
 
 model Doctor {
   doctorid       Int       @id @unique @default(autoincrement())
+  doctorverified Boolean?  @default(false)
+  governmentid   String?   @unique
   name           String?
   email          String?
   lastname       String?
@@ -92,8 +96,24 @@ model Doctor {
   patient_id     String?
   specialization String?
   image          String?
+  hospitalid     Int?
+  hospital       Hospital? @relation(fields: [hospitalid], references: [id])
   dob            DateTime?
   patients       Patient[]
+}
+
+model Hospital {
+  id               Int      @id @default(autoincrement())
+  ambulancecount   Int?
+  bedcount         Int?
+  hospitalname     String?
+  hospitaladdress  String?
+  hospitalphone    BigInt?
+  hospitalverified Boolean? @default(false)
+  hospitalimage    String?
+  doctors          Doctor[] // Add the opposite relation field
+
+  @@map("hospitals") //map a specific table name to the model in the database schema
 }
 
 enum Role {

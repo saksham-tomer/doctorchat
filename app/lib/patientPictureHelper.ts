@@ -12,6 +12,10 @@ export default async function getPatientPicture(email: string | undefined) {
       image: true,
     },
   });
-
-  return patientImage;
+  if (patientImage) {
+    return patientImage;
+  } else {
+    let err = "no image can get";
+    return err;
+  }
 }

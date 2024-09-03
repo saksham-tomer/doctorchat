@@ -41,6 +41,20 @@ import { redirect, useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { createPatientProfile } from "@/app/lib/handlePatientProfile";
 import getPatientPicture from "@/app/lib/patientPictureHelper";
+import avatar from "@/public/colorfulavatar.jpg";
+
+/**
+ * @author Saksham Tomar
+ * @date 2021-10-06
+ * @description Pointers
+ * @remarks
+ * 1. This is the fetch request to get the patient image from the server.
+ * 2. The GET method does not have a body.
+ * 3. Always stringify the body before sending it to the server.
+ * 4. Return the response as JSON.
+ * 5. Await the data.json() to get the response body.
+ * @todo Error in fetching session sometimes from useSession hook results in undefined email.
+ */
 
 type Props = {
   props: React.ReactNode;
@@ -51,7 +65,10 @@ const Page = (props: Props) => {
   let { titleCallback } = useContext(TitleContext);
   const [selectedSex, setSelectedSex] = useState("Male");
   const [patientBanner, setPatientBanner] = useState(bannerDefault);
-  const [patientPicture, setPatientPicture] = useState<string | null>();
+  const [isOpen, setIsOpen] = useState(false);
+  const [patientPicture, setPatientPicture] = useState<
+    StaticImageData | string | Response | undefined
+  >();
   const [buttonState, setButtonState] = useState(false);
   const [tags, setTags] = useState<string[] | never>([]);
 
@@ -73,6 +90,7 @@ const Page = (props: Props) => {
   };
 
   const uploadImage = async () => {
+    setIsOpen(false);
     const email = session?.user.email;
     const res = await fetch("http://localhost:3000/api/uploadPatientPicture", {
       method: "POST",
@@ -100,31 +118,33 @@ const Page = (props: Props) => {
   const router = useRouter();
 
   useEffect(() => {
-    getPatientPicture(session?.user.email);
-    getPatientPicture(session?.user.email)
-      .then((image) => setPatientPicture(image))
-      .catch((error) => console.error("Error getting patient picture:", error));
-    // async () => {
-    //   let success = await fetch("http://localhost:3000/api/getPatientInfo", {
-    //     method: "GET",
-    //     headers: {
-    //       "Content-Type": "application/json",
-    //     },
-    //   });
-    //   if (success) {
-    //     console.log("look here bitches", success);
-    //     if (success.ok) {
-    //       const { image } = await success.json();
-    //       console.log("user image ===>", image);
-    //       setPatientPicture((prev) => (prev = image));
-    //     } else {
-    //       console.error("Image not found failed");
-    //     }
-    //   } else console.error("No image found");
-    // };
-    //setPatientPicture((prev) => (prev = session?.user.image));
-    console.log("setPatientPicture", patientPicture);
-  }, [session?.user.image]);
+    const email = session?.user.email;
+    if (!email) {
+      setPatientPicture((prev) => (prev = avatar));
+    }
+
+    const getImg = async () => {
+      let patientImage = await fetch(
+        "http://localhost:3000/api/getPatientImage",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ email: email }),
+        }
+      );
+      if (!patientImage.ok) {
+        console.log("Patient image fetched failed");
+      }
+      const data = await patientImage.json();
+      if (data) {
+        console.log("Image fetched successfully");
+        setPatientPicture(data.image);
+      }
+    };
+    getImg();
+  }, [session?.user.email]);
 
   titleCallback("Create Profile");
 
@@ -142,7 +162,7 @@ const Page = (props: Props) => {
         />
         <TooltipProvider>
           <Tooltip>
-            <Dialog>
+            <Dialog onOpenChange={setIsOpen} open={isOpen}>
               <DialogTrigger asChild>
                 <TooltipTrigger asChild>
                   <div className="max-w-fit ">
