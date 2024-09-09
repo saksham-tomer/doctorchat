@@ -96,6 +96,7 @@ model Doctor {
   patient_id     String?
   specialization String?
   image          String?
+  rating         String?
   hospitalid     Int?
   hospital       Hospital? @relation(fields: [hospitalid], references: [id])
   dob            DateTime?

@@ -11,21 +11,20 @@ export const TitleContext = createContext<null | any>(null);
 
 const Layout = ({ children }: { children: React.ReactNode }) => {
   const [titleString, setTitle] = useState<string>("");
-  const [isOnline, setIsOnline] = useState<boolean>();
+  const [isOnline, setIsOnline] = useState<boolean>(false);
 
   const { data: session } = useSession();
 
   let titleCallback: (pageTitle: string | any) => void = (pageTitle) => {
     setTitle((prev) => (prev = pageTitle));
   };
-
+  // let changeOnline = (Online): void => {
+  //   Online && setIsOnline(true);
+  // };
   useEffect(() => {
-    const changeOnline = (): void => {
-      if (session?.user) {
-        setIsOnline(true);
-      }
-    };
-    changeOnline();
+    if (session?.user) {
+      setIsOnline(true);
+    }
     setTitle(titleString);
   }, [titleString, session?.user]);
   return (

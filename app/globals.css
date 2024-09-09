@@ -83,6 +83,9 @@
     body {
       @apply bg-background text-foreground;
     }
+      h1, h2, h3, h4, h5, h6 {
+    @apply font-heading;
+  }
   }
   .formbg{
     background-image: url('/formbg.jpg');
@@ -94,6 +97,7 @@
  .neondoc{
   background-image: url('/neondoc.jpg');
  }
+
 
   .blob{
     background-image: url('/bg4.svg');
